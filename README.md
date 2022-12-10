@@ -1,4 +1,4 @@
-# ThucTapChuyenNganh
+# Thực Tập Chuyên Ngành
 Mô tả quá trình thực tập chuyên ngành của Hoàng Minh Tâm - MSSV: 61131007 - Lớp: 61. CNTT -1
 Bảng Training của công ty INFOdation cho FrontEnd.
 ## Ngôn ngữ: Angular
