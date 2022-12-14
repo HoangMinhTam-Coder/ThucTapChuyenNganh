@@ -95,6 +95,9 @@ export class AppComponent {
 </div>
 
 <p>Các Menthod và chức năng của từng Method<p>
- | 1    |  2    |  3 |
- |------|-------|-----|
- |    s  |s     |k    |
+
+ | Method  | Mục đích | Thời gian |
+|---------|-----------|-----------|
+|    1    | Angular Module<br>Angular Component<br>Angular lifecyle hook|  |
+|    2	  | Angular Route<br>CanActive<br>CanDeactivate|  |
+
