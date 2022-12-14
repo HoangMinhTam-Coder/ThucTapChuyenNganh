@@ -96,5 +96,5 @@ export class AppComponent {
 
 <p>Các Menthod và chức năng của từng Method<p>
  | 1    |  2    |  3 |
- |______|_______|____|
- |    s  |s||
+ |------|-------|-----|
+ |    s  |s     |k    |
