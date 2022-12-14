@@ -87,3 +87,14 @@ export class AppComponent {
 - AppComponent là thành phần cha của ứng dụng. Tất cả các thành phần mới tạo ra sau này đều là thành phần con của AppComponent.
 
 ## c. Angular lifecyle hook
+<p>Một <b>LifeCycle</b> của <b>Component</b> bắt đầu khi Angular khởi tạo <b>class Component</b> và hiển thị dạng xem thành phần cùng với các chế độ xem con của nó. <b>LifeCycle</b> tiếp tục với tính năng phát hiện thay đổi, khi Angular kiểm tra xem khi nào các thuộc tính ràng buộc dữ liệu thay đổi và cập nhật cả chế độ xem và phiên bản thành phần nếu cần. <b>LifeCycle</b> kết thúc khi Angular phá hủy Component và xóa mẫu đã kết xuất khỏi DOM. Các lệnh có vòng đời tương tự, vì Angular tạo, cập nhật và phá hủy các phiên bản trong quá trình thực thi.</p>
+ <p>Ứng dụng của bạn có thể sử dụng các phương thức móc vòng đời(<b>LifeCycle Hook Method</b>) để khai thác các sự kiện chính trong vòng đời của một cấu phần hoặc lệnh nhằm khởi tạo các phiên bản mới, bắt đầu phát hiện thay đổi khi cần, phản hồi các bản cập nhật trong quá trình phát hiện thay đổi và dọn dẹp trước khi xóa phiên bản.</p>
+ <p>Một vòng đời của Component sẽ có thứ tự như sau: OnChanges => OnInit => DoCheck => AfterContentInit => AfterContentChecked => AfterViewInit => AfterViewChecked => OnDestroy.</p>
+ <div align="center">
+  <img src="https://images.viblo.asia/3e8bca05-06d1-4999-98a6-628bd57a7c21.png">
+</div>
+
+<p>Các Menthod và chức năng của từng Method<p>
+ | 1    |  2    |  3 |
+ |______|_______|____|
+ |    s  |s||
