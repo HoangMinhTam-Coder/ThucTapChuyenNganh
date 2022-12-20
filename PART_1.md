@@ -95,7 +95,7 @@ export class AppComponent {
 </div>
 
 #### Các Menthod và chức năng của từng Method
-**1. <code>ngOnInit()</code>**
+**1. <code>ngOnChanges()</code>**
 - Phản hồi khi Angular đặt hoặc đặt lại các thuộc tính đầu vào liên kết dữ liệu. Phương thức nhận một <code>SimpleChanges</code> đối tượng có giá trị thuộc tính hiện tại và trước đó.
 > NOTE: Điều này xảy ra thường xuyên, do đó, bất kỳ thao tác nào bạn thực hiện ở đây đều ảnh hưởng đáng kể đến hiệu suất.
 <br>
@@ -144,3 +144,94 @@ export class ParentComponent {
 ```
 
 - Tóm tắt: ParentComponent liên kết dữ liệu đầu vào với ChildComponent. Thành phần nhận dữ liệu này thông qua thuộc tính của nó <code>@Input</code>.<code>ngOnChanges</code> được thực thi. Sau năm giây, <code>setTimeout</code> gọi lại sẽ kích hoạt. ParentComponent thay đổi nguồn dữ liệu của thuộc tính đầu vào của ChildComponent. Dữ liệu mới chảy qua thuộc tính đầu vào.<code>ngOnChanges</code> được gọi 1 lần nữa.
+
+**2. <code>ngOnInit()</code>**
+- Khởi tạo <code>Directive</code> hoặc <code>Component</code> sau khi Angular lần đầu tiên hiển thị các thuộc tính liên kết dữ liệu và đặt các thuộc tính đầu vào của <code>Directive</code> hoặc <code>Component</code>.
+- Được gọi một lần, sau lần gọi <code>ngOnChanges()</code> đầu tiên. <code>ngOnInit()</code> vẫn được gọi ngay cả khi <code>ngOnChanges()</code> không được gọi tới (đó là trường hợp không có đầu vào giới hạn mẫu).
+- Code Example:
+
+```typescript
+import { Component, Input, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template: `
+  <h3>Child Component</h3>
+  <p>TICKS: {{ lifecycleTicks }}</p>
+  <p>DATA: {{ data }}</p>
+  `
+})
+export class ChildComponent implements OnInit {
+  @Input() data: string;
+  lifecycleTicks: number = 0;
+
+  ngOnInit() {
+    this.lifecycleTicks++;
+  }
+}
+
+@Component({
+  selector: 'app-parent',
+  template: `
+  <h1>ngOnInit Example</h1>
+  <app-child [data]="arbitraryData"></app-child>
+  `
+})
+export class ParentComponent {
+  arbitraryData: string = 'initial';
+
+  constructor() {
+    setTimeout(() => {
+      this.arbitraryData = 'final';
+    }, 5000);
+  }
+}
+```
+
+- Tóm tắt: ParentComponent liên kết dữ liệu đầu vào với ChildComponent. Thành phần nhận dữ liệu này thông qua thuộc tính của nó <code>@Input</code>.<code>ngOnInit</code> được thực thi. Sau năm giây, <code>setTimeout</code> gọi lại sẽ kích hoạt. ParentComponent thay đổi nguồn dữ liệu của thuộc tính đầu vào của ChildComponent. Dữ liệu mới chảy qua thuộc tính đầu vào.<code>ngOnChanges</code> không được gọi lại nữa.
+
+**3. <code>ngDoCheck()</code>**
+- Phát hiện và hành động theo những thay đổi mà Angular không thể hoặc sẽ không tự phát hiện.
+- Được gọi ngay sau <code>ngOnChanges()</code> mỗi lần chạy phát hiện thay đổi và ngay sau lần chạy <code>ngOnInit()</code> đầu tiên.
+- Code Example:
+
+```typescript
+import { Component, DoCheck, ChangeDetectorRef } from '@angular/core';
+
+@Component({
+  selector: 'app-example',
+  template: `
+  <h1>ngDoCheck Example</h1>
+  <p>DATA: {{ data[data.length - 1] }}</p>
+  `
+})
+export class ExampleComponent implements DoCheck {
+  lifecycleTicks: number = 0;
+  oldTheData: string;
+  data: string[] = ['initial'];
+
+  constructor(private changeDetector: ChangeDetectorRef) {
+    this.changeDetector.detach(); // lets the class perform its own change detection
+
+    setTimeout(() => {
+      this.oldTheData = 'final'; // intentional error
+      this.data.push('intermediate');
+    }, 3000);
+
+    setTimeout(() => {
+      this.data.push('final');
+      this.changeDetector.markForCheck();
+    }, 6000);
+  }
+
+  ngDoCheck() {
+    console.log(++this.lifecycleTicks);
+
+    if (this.data[this.data.length - 1] !== this.oldTheData) {
+      this.changeDetector.detectChanges();
+    }
+  }
+}
+```
+
+- Tóm tắt: Lớp khởi tạo sau hai vòng phát hiện thay đổi. Trình tạo lớp bắt đầu <code>setTimeout</code> hai lần. Sau ba giây,<code>setTimeout</code> phát hiện thay đổi trình kích hoạt đầu tiên. <code>ngDoCheck</code> đánh dấu màn hình để cập nhật. Ba giây sau, <code>setTimeout</code> phát hiện thay đổi kích hoạt lần thứ hai. Không cần cập nhật chế độ xem theo đánh giá của <code>ngDoCheck</code>.
