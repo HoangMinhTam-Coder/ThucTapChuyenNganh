@@ -94,10 +94,53 @@ export class AppComponent {
   <img src="https://images.viblo.asia/3e8bca05-06d1-4999-98a6-628bd57a7c21.png">
 </div>
 
-<p>Các Menthod và chức năng của từng Method<p>
+#### Các Menthod và chức năng của từng Method
+**1. <code>ngOnInit()</code>**
+- Phản hồi khi Angular đặt hoặc đặt lại các thuộc tính đầu vào liên kết dữ liệu. Phương thức nhận một <code>SimpleChanges</code> đối tượng có giá trị thuộc tính hiện tại và trước đó.
+> NOTE: Điều này xảy ra thường xuyên, do đó, bất kỳ thao tác nào bạn thực hiện ở đây đều ảnh hưởng đáng kể đến hiệu suất.
+<br>
 
- | Method  | Mục đích | Thời gian |
-|---------|-----------|-----------|
-|    1    | Angular Module<br>Angular Component<br>Angular lifecyle hook|  |
-|    2	  | Angular Route<br>CanActive<br>CanDeactivate|  |
+- Được gọi trước <code>ngOnInit()</code> (nếu thành phần có đầu vào ràng buộc) và bất cứ khi nào một hoặc nhiều thuộc tính đầu vào ràng buộc dữ liệu thay đổi.
+> NOTE: Nếu thành phần của bạn không có đầu vào hoặc bạn sử dụng nó mà không cung cấp bất kỳ đầu vào nào, khung sẽ không gọi ngOnChanges().
 
+- Code Example:
+
+```typescript
+import { Component, Input, OnChanges } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template: `
+  <h3>Child Component</h3>
+  <p>TICKS: {{ lifecycleTicks }}</p>
+  <p>DATA: {{ data }}</p>
+  `
+})
+export class ChildComponent implements OnChanges {
+  @Input() data: string;
+  lifecycleTicks: number = 0;
+
+  ngOnChanges() {
+    this.lifecycleTicks++;
+  }
+}
+
+@Component({
+  selector: 'app-parent',
+  template: `
+  <h1>ngOnChanges Example</h1>
+  <app-child [data]="arbitraryData"></app-child>
+  `
+})
+export class ParentComponent {
+  arbitraryData: string = 'initial';
+
+  constructor() {
+    setTimeout(() => {
+      this.arbitraryData = 'final';
+    }, 5000);
+  }
+}
+```
+
+- Tóm tắt: ParentComponent liên kết dữ liệu đầu vào với ChildComponent. Thành phần nhận dữ liệu này thông qua thuộc tính của nó <code>@Input</code>.<code>ngOnChanges</code> được thực thi. Sau năm giây, <code>setTimeout</code> gọi lại sẽ kích hoạt. ParentComponent thay đổi nguồn dữ liệu của thuộc tính đầu vào của ChildComponent. Dữ liệu mới chảy qua thuộc tính đầu vào.<code>ngOnChanges</code> được gọi 1 lần nữa.
