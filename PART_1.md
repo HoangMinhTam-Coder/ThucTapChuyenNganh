@@ -235,3 +235,114 @@ export class ExampleComponent implements DoCheck {
 ```
 
 - Tóm tắt: Lớp khởi tạo sau hai vòng phát hiện thay đổi. Trình tạo lớp bắt đầu <code>setTimeout</code> hai lần. Sau ba giây,<code>setTimeout</code> phát hiện thay đổi trình kích hoạt đầu tiên. <code>ngDoCheck</code> đánh dấu màn hình để cập nhật. Ba giây sau, <code>setTimeout</code> phát hiện thay đổi kích hoạt lần thứ hai. Không cần cập nhật chế độ xem theo đánh giá của <code>ngDoCheck</code>.
+
+**4. <code>ngAfterContentInit()</code>**
+- Phản hồi sau khi Angular chiếu nội dung bên ngoài vào <code>View</code> của <code>Component</code>hoặc vào <code>View</code> của <code>Directive</code>.
+- Được gọi một lần sau lần đầu tiên <code>ngDoCheck()</code> thực thi.
+- <code>ngAfterContentInit</code> kích hoạt sau khi DOM content của <code>Component</code> khởi tạo(tải lần đầu tiên). Chờ <code>@ContentChild(ren)</code> truy vấn là trường hợp sử dụng chính của hook. <code>@ContentChild(ren)</code> truy vấn mang lại tham chiếu phần tử cho nội dung DOM. Như vậy, chúng không khả dụng cho đến sau khi tải nội dung DOM. Do đó tại sao <code>ngAfterContentInit</code> và đối tác của nó <code>ngAfterContentChecked</code> được sử dụng.
+
+```typescript
+import { Component, ContentChild, AfterContentInit, ElementRef, Renderer2 } from '@angular/core';
+
+@Component({
+  selector: 'app-c',
+  template: `
+  <p>I am C.</p>
+  <p>Hello World!</p>
+  `
+})
+export class CComponent { }
+
+@Component({
+  selector: 'app-b',
+  template: `
+  <p>I am B.</p>
+  <ng-content></ng-content>
+  `
+})
+export class BComponent implements AfterContentInit {
+  @ContentChild("BHeader", { read: ElementRef }) hRef: ElementRef;
+  @ContentChild(CComponent, { read: ElementRef }) cRef: ElementRef;
+
+  constructor(private renderer: Renderer2) { }
+
+  ngAfterContentInit() {
+    this.renderer.setStyle(this.hRef.nativeElement, 'background-color', 'yellow')
+
+    this.renderer.setStyle(this.cRef.nativeElement.children.item(0), 'background-color', 'pink');
+    this.renderer.setStyle(this.cRef.nativeElement.children.item(1), 'background-color', 'red');
+  }
+}
+
+@Component({
+  selector: 'app-a',
+  template: `
+  <h1>ngAfterContentInit Example</h1>
+  <p>I am A.</p>
+  <app-b>
+    <h3 #BHeader>BComponent Content DOM</h3>
+    <app-c></app-c>
+  </app-b>
+  `
+})
+export class AComponent { }
+```
+
+**5. <code>ngAfterContentChecked()</code>**
+- Phản hồi sau khi Angular kiểm tra nội dung được chiếu vào <code>Directive</code> và <code>Component</code>.
+- Được gọi sau <code>ngAfterContentInit()</code> và mỗi lần <code>ngDoCheck()</code> được gọi.
+
+```typescript
+import { Component, ContentChild, AfterContentChecked, ElementRef, Renderer2 } from '@angular/core';
+
+@Component({
+  selector: 'app-c',
+  template: `
+  <p>I am C.</p>
+  <p>Hello World!</p>
+  `
+})
+export class CComponent { }
+
+@Component({
+  selector: 'app-b',
+  template: `
+  <p>I am B.</p>
+  <button (click)="$event">CLICK</button>
+  <ng-content></ng-content>
+  `
+})
+export class BComponent implements AfterContentChecked {
+  @ContentChild("BHeader", { read: ElementRef }) hRef: ElementRef;
+  @ContentChild(CComponent, { read: ElementRef }) cRef: ElementRef;
+
+  constructor(private renderer: Renderer2) { }
+
+  randomRGB(): string {
+    return `rgb(${Math.floor(Math.random() * 256)},
+    ${Math.floor(Math.random() * 256)},
+    ${Math.floor(Math.random() * 256)})`;
+  }
+
+  ngAfterContentChecked() {
+    this.renderer.setStyle(this.hRef.nativeElement, 'background-color', this.randomRGB());
+    this.renderer.setStyle(this.cRef.nativeElement.children.item(0), 'background-color', this.randomRGB());
+    this.renderer.setStyle(this.cRef.nativeElement.children.item(1), 'background-color', this.randomRGB());
+  }
+}
+
+@Component({
+  selector: 'app-a',
+  template: `
+  <h1>ngAfterContentChecked Example</h1>
+  <p>I am A.</p>
+  <app-b>
+    <h3 #BHeader>BComponent Content DOM</h3>
+    <app-c></app-c>
+  </app-b>
+  `
+})
+export class AComponent { }
+```
+
+- Tóm tắt: Kết xuất bắt đầu với AComponent. Để hoàn thành, AComponent phải kết xuất BComponent. BComponent dự án nội dung được lồng trong phần tử của nó thông qua<code><ng-content></ng-content></code>phần tử. CComponent là một phần của nội dung dự kiến. Nội dung được chiếu kết thúc hiển thị. BComponent kết thúc kết xuất.<code>ngAfterContentChecked</code> được gọi AComponent kết thúc kết xuất.<code>ngAfterViewChecked</code> có thể kích hoạt lại thông qua phát hiện thay đổi.
