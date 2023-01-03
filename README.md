@@ -21,5 +21,6 @@ Bảng Training của công ty INFOdation cho FrontEnd.
 |    8	  | Forms<br>FormArray<br>Validations|
 |    9	  | Angular Material<br>Angular CDK|
 |    10	  | Animation<br>NgZone|
+|    11	  | Unit Testing|
 
 </div>
