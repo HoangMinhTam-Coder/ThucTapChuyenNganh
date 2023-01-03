@@ -7,6 +7,7 @@ Bảng Training của công ty INFOdation cho FrontEnd.
 </div>
                                                                                                                
 ## Ngôn ngữ: Angular
+<div align="center">
 
 | Chủ đề  | Tên Đối tượng tìm hiểu |
 |---------|------------------------|
@@ -20,3 +21,5 @@ Bảng Training của công ty INFOdation cho FrontEnd.
 |    8	  | Forms<br>FormArray<br>Validations|
 |    9	  | Angular Material<br>Angular CDK|
 |    10	  | Animation<br>NgZone|
+
+</div>
